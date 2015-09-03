@@ -70,7 +70,7 @@ def eliminar(file):
     os.remove(file)
 
 
-def cargaRadar(dir,inputfile,delim,id_radar,connstr,tableoutput):
+def cargaRadar(inputfile,delim,id_radar,connstr,tableoutput):
     # Abrir conexion para insertar valores
     ogr.UseExceptions()
     try:
@@ -78,38 +78,45 @@ def cargaRadar(dir,inputfile,delim,id_radar,connstr,tableoutput):
         print "Conexion exitosa..."
     except:
         print '[ ERROR ]: Error de conexion'
-        sys.exit( 1 )
+        return
+        #sys.exit( 1 )
 
     # Abrir archivo de texto
     try:
-        file = open(dir+inputfile)
-        print 'Archivo cargado...'
+        file = open(inputfile)
+        print 'Archivo leido exitosamente...'
     except:
         print '[ ERROR ]: Error al leer el archivo'
-        sys.exit(1)
+        return
+        #sys.exit(1)
     line = file.readline()
     line = file.readline()
 
     # Insertar registros en la tabla
     aux = 1
-    time_ini = dt.datetime.now()
-    while(line != "" and aux <= 10000):
+    fecha_anterior = '1900-01-01'
+    # TODO: eliminar el limte de registros antes de empaquetar
+    limite = 100
+    while(line != "" and aux <= limite):
         Line = line.split(delim)
         fecha = Line[0]
         x = Line[1]
         y = Line[2]
         deformacion = Line[3]
+        if fecha != fecha_anterior:
+            print "Cargando fecha '%s'..." %(str(fecha))
+            fecha_anterior = fecha
         sql = "INSERT INTO %s VALUES ('%s', '%s', '%s', '%s', '%s');" %(tableoutput, fecha, id_radar, x, y, deformacion)
         try:
             conn.ExecuteSQL(sql)
         except Exception,e:
             print '[ ERROR ]: Error al cargar los datos \n Mensaje %s' %(e)
-            sys.exit(1)
+            return
+            #sys.exit(1)
+        # TODO: eliminar este print de control
         if aux == 1 or aux == 10 or aux == 100 or aux == 1000 or aux == 10000:
             print 'insertando registro ' + str(aux) + '...'
         aux = aux+1
         line = file.readline()
     print "Archivo cargado en base de datos"
-    time_fin = dt.datetime.now()
-    print 'Tiempo de ejecucion %s'%(str(time_fin-time_ini))
 #   Fin de la funcion
