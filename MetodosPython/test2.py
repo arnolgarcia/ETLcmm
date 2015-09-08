@@ -2,6 +2,8 @@ __author__ = 'Arnol'
 
 import metodosMCP as met
 import os
+import carga_salida_modelo as loadMod
+
 
 # Parametros
 dir = 'C:/Users/Arnol/Desktop/puntos_poligonos_cmm/'
@@ -27,4 +29,16 @@ password = "Admin321"
 connstr = 'PG: host=%s port=%s dbname=%s user=%s password=%s' %(host,port,dbname,user,password)
 
 
-met.cargaRadar(dir2,inputfile,delim,id_radar,connstr,tableoutput)
+#met.cargaRadar(dir2,inputfile,delim,id_radar,connstr,tableoutput)
+idrad = 2
+dir = 'C:/Users/Arnol/Desktop/salidas modelo cmm/VectorMovIBIS (1)'
+file = 'VectorMovIBIS%d.txt'%(idrad)
+out = 'vectorMov_cons.txt'
+
+inputf = dir+'/'+file
+outputf = dir+'/'+out
+delim = '\t'
+modo = 'a'
+if idrad == 1:
+    modo = 'w'
+loadMod.formatoSalidaVectorMovIBIS(inputf,outputf,delim,idrad,modo)
